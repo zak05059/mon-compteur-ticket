@@ -1,6 +1,6 @@
 // Service worker : garde l'application disponible sans réseau.
 // Changez VERSION à chaque mise à jour pour forcer le rafraîchissement sur les téléphones.
-const VERSION = "mct-v1.0.2";
+const VERSION = "mct-v1.0.4";
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./firebase-config.js",
   "./style.css", "./app.js", "./store.js", "./pdf.js", "./data.js",

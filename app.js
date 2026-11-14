@@ -79,32 +79,17 @@ function showFatal(msg){ hideSplash(); $("#shell").hidden = true; const a = $("#
 function showAuth(msg){
   hideSplash(); $("#shell").hidden = true; closeSheet();
   const a = $("#auth"); a.hidden = false;
-  const login = UI.authTab === "login", reset = UI.authTab === "reset";
   a.innerHTML = `<div class="auth"><div class="auth-card">
     <div class="auth-brand"><img src="logo.jpg" alt="KBOWD Group"><h1>Mon Compteur de Ticket</h1><p>Suivi des installations FTTH · KBOWD Group</p></div>
     <div class="card"><div class="stack">
-      ${reset ? "" : `<div class="seg tabs2" role="group"><button type="button" data-auth="login" aria-pressed="${login}">Se connecter</button><button type="button" data-auth="signup" aria-pressed="${!login}">Créer un compte</button></div>`}
-      ${reset ? `<h2>Mot de passe oublié</h2><p class="small muted" style="margin:0">Saisissez votre adresse : vous recevrez un lien pour choisir un nouveau mot de passe.</p>` : ""}
-      <form id="authForm" class="stack" novalidate>
-        ${UI.authTab === "signup" ? `<label class="field"><span>Nom et prénom</span><input type="text" id="a-nom" name="nom" autocomplete="name" required></label>` : ""}
-        <label class="field"><span>Adresse e-mail</span><input type="email" id="a-mail" name="email" autocomplete="email" inputmode="email" required></label>
-        ${reset ? "" : `<label class="field"><span>Mot de passe</span><input type="password" id="a-pw" name="pw" autocomplete="${login ? "current-password" : "new-password"}" minlength="6" required>${login ? "" : "<small>6 caractères au minimum</small>"}</label>`}
-        <div class="err" id="a-err" role="alert">${msg ? esc(msg) : ""}</div>
-        <button class="btn btn-violet btn-block" type="submit">${reset ? "Envoyer le lien" : login ? "Se connecter" : "Créer mon compte"}</button>
-      </form>
-      ${login ? `<button class="link" type="button" data-auth="reset">Mot de passe oublié ?</button>` : reset ? `<button class="link" type="button" data-auth="login">Retour à la connexion</button>` : `<p class="small muted" style="margin:0">Après la création, un administrateur valide votre compte avant que vous puissiez saisir.</p>`}
+      <button class="btn btn-primary btn-block" type="button" id="a-google">Continuer avec Google</button>
+      <div class="err" id="a-err" role="alert">${msg ? esc(msg) : ""}</div>
+      <p class="small muted" style="margin:0;text-align:center">Connectez-vous avec votre compte Google. À la première connexion, un administrateur doit valider votre accès avant que vous puissiez saisir.</p>
     </div></div></div></div>`;
-  a.querySelector("#authForm").addEventListener("submit", async e => {
-    e.preventDefault(); const f = e.target, err = a.querySelector("#a-err"), btn = f.querySelector("button[type=submit]");
-    const email = f.email.value.trim(), pw = f.pw ? f.pw.value : "";
-    if (!email) return fail(err, "Saisissez votre adresse e-mail.", f.email);
-    if (UI.authTab === "signup" && !f.nom.value.trim()) return fail(err, "Saisissez votre nom.", f.nom);
-    if (!reset && pw.length < 6) return fail(err, "Le mot de passe doit contenir au moins 6 caractères.", f.pw);
-    btn.disabled = true; err.textContent = "";
-    try {
-      if (reset){ await S.store.reset(email); UI.authTab = "login"; showAuth("Lien envoyé. Consultez votre boîte e-mail."); return; }
-      if (login) await S.store.signIn(email, pw); else await S.store.signUp(f.nom.value.trim(), email, pw);
-    } catch (x) { err.textContent = errorText(x); btn.disabled = false; }
+  const g = a.querySelector("#a-google");
+  g.addEventListener("click", async () => {
+    const err = a.querySelector("#a-err"); err.textContent = ""; g.disabled = true;
+    try { await S.store.signInGoogle(); } catch (x) { err.textContent = errorText(x); g.disabled = false; }
   });
 }
 function showPending(){

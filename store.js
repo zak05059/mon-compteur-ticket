@@ -17,6 +17,11 @@ const AUTH_ERRORS = {
   "auth/email-already-in-use": "Un compte existe déjà avec cette adresse. Connectez-vous.",
   "auth/weak-password": "Le mot de passe doit contenir au moins 6 caractères.",
   "auth/too-many-requests": "Trop de tentatives. Patientez quelques minutes.",
+  "auth/popup-closed-by-user": "Connexion Google annulée.",
+  "auth/cancelled-popup-request": "Connexion Google annulée.",
+  "auth/popup-blocked": "Le navigateur a bloqué la fenêtre Google. Autorisez les fenêtres surgissantes puis réessayez.",
+  "auth/unauthorized-domain": "Ce site n'est pas autorisé dans Firebase (Authentication > Paramètres > Domaines autorisés).",
+  "auth/operation-not-allowed": "La connexion Google n'est pas encore activée dans Firebase.",
   "auth/network-request-failed": "Pas de connexion internet. Réessayez quand le réseau revient.",
   "auth/missing-password": "Saisissez le mot de passe.",
   "permission-denied": "Vous n'avez pas le droit de faire cette modification.",
@@ -40,6 +45,15 @@ async function firebaseStore(){
     mode: "firebase",
     onAuth: cb => authMod.onAuthStateChanged(auth, u => cb(u ? {uid: u.uid, email: u.email, nom: u.displayName || ""} : null)),
     signIn: (email, pw) => authMod.signInWithEmailAndPassword(auth, email, pw),
+    async signInGoogle(){
+      const provider = new authMod.GoogleAuthProvider();
+      provider.setCustomParameters({prompt: "select_account"});
+      try { await authMod.signInWithPopup(auth, provider); }
+      catch (e) {
+        if (e && e.code === "auth/popup-blocked") { await authMod.signInWithRedirect(auth, provider); return; }
+        throw e;
+      }
+    },
     async signUp(nom, email, pw){
       const cred = await authMod.createUserWithEmailAndPassword(auth, email, pw);
       try { await authMod.updateProfile(cred.user, {displayName: nom}); } catch (e) {}
@@ -87,7 +101,7 @@ function localStore(){
   return {
     mode: "local",
     onAuth: cb => { setTimeout(() => cb(me), 0); return () => {}; },
-    signIn: async () => {}, signUp: async () => {}, reset: async () => {}, signOut: async () => {},
+    signIn: async () => {}, signInGoogle: async () => {}, signUp: async () => {}, reset: async () => {}, signOut: async () => {},
     watchProfile: (user, cb) => { setTimeout(() => cb({uid: "local", nom: "Vous", role: "admin"}), 0); return () => {}; },
     subscribe(fn, onSync){ onData = fn; COLLS.forEach(emit); emit("settings"); fn("users", [{uid: "local", nom: "Vous", role: "admin"}]); onSync({pending: false, cache: false}); },
     async put(coll, item){ const a = st[coll]; const i = a.findIndex(x => x.id === item.id); if (i >= 0) a[i] = clean(item); else a.push(clean(item)); save(); emit(coll); },

@@ -14,7 +14,7 @@ function loadJsPdf(){
 }
 async function logoData(){
   try {
-    const blob = await (await fetch("icons/logo.jpg")).blob();
+    const blob = await (await fetch("logo.jpg")).blob();
     return await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.onerror = () => r(null); fr.readAsDataURL(blob); });
   } catch (e) { return null; }
 }

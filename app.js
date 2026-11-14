@@ -75,13 +75,13 @@ async function boot(){
   });
 }
 function hideSplash(){ $("#splash").hidden = true; }
-function showFatal(msg){ hideSplash(); $("#shell").hidden = true; const a = $("#auth"); a.hidden = false; a.innerHTML = `<div class="auth"><div class="card auth-card"><div class="auth-brand"><img src="icons/logo.jpg" alt=""><h1>Mon Compteur de Ticket</h1></div><p class="err">${esc(msg)}</p><button class="btn btn-ghost btn-block" type="button" onclick="location.reload()">Réessayer</button></div></div>`; }
+function showFatal(msg){ hideSplash(); $("#shell").hidden = true; const a = $("#auth"); a.hidden = false; a.innerHTML = `<div class="auth"><div class="card auth-card"><div class="auth-brand"><img src="logo.jpg" alt=""><h1>Mon Compteur de Ticket</h1></div><p class="err">${esc(msg)}</p><button class="btn btn-ghost btn-block" type="button" onclick="location.reload()">Réessayer</button></div></div>`; }
 function showAuth(msg){
   hideSplash(); $("#shell").hidden = true; closeSheet();
   const a = $("#auth"); a.hidden = false;
   const login = UI.authTab === "login", reset = UI.authTab === "reset";
   a.innerHTML = `<div class="auth"><div class="auth-card">
-    <div class="auth-brand"><img src="icons/logo.jpg" alt="KBOWD Group"><h1>Mon Compteur de Ticket</h1><p>Suivi des installations FTTH · KBOWD Group</p></div>
+    <div class="auth-brand"><img src="logo.jpg" alt="KBOWD Group"><h1>Mon Compteur de Ticket</h1><p>Suivi des installations FTTH · KBOWD Group</p></div>
     <div class="card"><div class="stack">
       ${reset ? "" : `<div class="seg tabs2" role="group"><button type="button" data-auth="login" aria-pressed="${login}">Se connecter</button><button type="button" data-auth="signup" aria-pressed="${!login}">Créer un compte</button></div>`}
       ${reset ? `<h2>Mot de passe oublié</h2><p class="small muted" style="margin:0">Saisissez votre adresse : vous recevrez un lien pour choisir un nouveau mot de passe.</p>` : ""}
@@ -110,7 +110,7 @@ function showAuth(msg){
 function showPending(){
   hideSplash(); $("#shell").hidden = true;
   const a = $("#auth"); a.hidden = false;
-  a.innerHTML = `<div class="auth"><div class="auth-card"><div class="auth-brand"><img src="icons/logo.jpg" alt=""><h1>Compte en attente</h1>
+  a.innerHTML = `<div class="auth"><div class="auth-card"><div class="auth-brand"><img src="logo.jpg" alt=""><h1>Compte en attente</h1>
     <p>Bonjour ${esc(S.profile.nom || "")}. Un administrateur doit valider votre compte. Cet écran s'ouvrira tout seul dès la validation.</p></div>
     <div class="card stack"><div class="kv"><dt>Compte</dt><dd>${esc(S.user.email || "")}</dd><dt>Statut</dt><dd><span class="badge b-gold">En attente</span></dd></div>
     <button class="btn btn-ghost btn-block" type="button" data-act="logout">Se déconnecter</button></div></div></div>`;

@@ -1,10 +1,10 @@
 // Service worker : garde l'application disponible sans réseau.
 // Changez VERSION à chaque mise à jour pour forcer le rafraîchissement sur les téléphones.
-const VERSION = "mct-v1.0.1";
+const VERSION = "mct-v1.0.2";
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest", "./firebase-config.js",
-  "./css/style.css", "./js/app.js", "./js/store.js", "./js/pdf.js", "./js/data.js",
-  "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png", "./icons/favicon.png", "./icons/logo.jpg",
+  "./style.css", "./app.js", "./store.js", "./pdf.js", "./data.js",
+  "./icon-192.png", "./icon-512.png", "./maskable-512.png", "./apple-touch-icon.png", "./favicon.png", "./logo.jpg",
 ];
 
 self.addEventListener("install", event => {

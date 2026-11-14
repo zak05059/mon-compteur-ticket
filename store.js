@@ -1,6 +1,6 @@
 // Stockage : Firebase (comptes + Firestore partagé, hors ligne compris) ou, tant que
 // firebase-config.js n'est pas rempli, stockage local sur le téléphone.
-import { firebaseConfig } from "../firebase-config.js";
+import { firebaseConfig } from "./firebase-config.js";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 export const configured = !!firebaseConfig && !!firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith("VOTRE");

@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// Règles de sécurité de Mon Compteur de Ticket.
+// Rôles (champ « role » du document users/{uid}) :
+//   attente     compte créé, en attente de validation : ne voit rien
+//   technicien  saisit et modifie ses propres tickets, crée des sous-zones
+//   chef        tout ce que fait le technicien + modifie tous les tickets, gère les zones
+//   admin       tout ce que fait le chef + réglages et validation des comptes
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function profile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function hasProfile() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function role() { return hasProfile() ? profile().role : 'aucun'; }
+    function isMember() { return role() in ['technicien', 'chef', 'admin']; }
+    function isChef() { return role() in ['chef', 'admin']; }
+    function isAdmin() { return role() == 'admin'; }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isMember());
+      // Création de son propre profil, toujours « en attente ».
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.role == 'attente';
+      // Chacun peut changer son nom, jamais son rôle. L'admin peut tout changer.
+      allow update: if isAdmin() || (request.auth.uid == uid && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+
+    match /tickets/{id} {
+      allow read: if isMember();
+      allow create: if isMember() && (request.resource.data.techId == request.auth.uid || isChef());
+      allow update, delete: if isChef() || (isMember() && resource.data.techId == request.auth.uid);
+    }
+
+    match /subzones/{id} {
+      allow read, create: if isMember();
+      allow update, delete: if isChef();
+    }
+
+    match /zones/{id} {
+      allow read: if isMember();
+      allow write: if isChef();
+    }
+
+    match /reports/{id} {
+      allow read, create: if isMember();
+      allow delete: if isChef();
+    }
+
+    match /settings/{id} {
+      allow read: if isMember();
+      allow write: if isAdmin();
+    }
+  }
+}
